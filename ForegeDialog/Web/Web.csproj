@@ -24,6 +24,7 @@
       </Content>
     </ItemGroup>
     <ItemGroup>
+      <Folder Include="Controllers\PublisherController\PublisherDtos\" />
       <Folder Include="wwwroot\" />
     </ItemGroup>
 </Project>

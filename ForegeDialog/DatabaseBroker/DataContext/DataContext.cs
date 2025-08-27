@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Entity.Models;
+using Entity.Models.Blog;
 using Entity.Models.Common;
 using Entity.Models.File;
+using Entity.Models.News;
 using Entity.Models.Translation;
 using Microsoft.EntityFrameworkCore;
 using User = Entity.Models.Users.User;
@@ -19,14 +21,19 @@ public class DataContext : DbContext
     }
 
     public  DbSet<FileModel> Files { get; set; }
-    
     public  DbSet<Translation> Translations { get; set; }
-    
-
     public  DbSet<User> Users { get; set; }
     public  DbSet<OurService> OurServices { get; set; }
     public  DbSet<OurResources> OurResources { get; set; }
     public  DbSet<OurValuedClients> OurValuedClients { get; set; }
+    public  DbSet<OurCategories> OurCategories { get; set; }
+    public  DbSet<OurTeam> OurTeams { get; set; }
+    public  DbSet<Statistics> Statistics { get; set; }
+    public  DbSet<OurPartners> OurPartners { get; set; }
+    public  DbSet<NewsCategory> NewsCategories { get; set; }
+    public  DbSet<Tags> Tags { get; set; }
+    public  DbSet<News> News { get; set; }
+    public  DbSet<BlogModel> BlogModels { get; set; }
 
 
     // private void TrackActionsAt()
