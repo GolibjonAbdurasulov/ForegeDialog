@@ -71,7 +71,7 @@ public class PublisherController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ResponseModelBase> GetAllAsync(long id)
+    public async Task<ResponseModelBase> GetAllAsync()
     {
         var res =  PublisherRepository.GetAllAsQueryable().ToList();
         
