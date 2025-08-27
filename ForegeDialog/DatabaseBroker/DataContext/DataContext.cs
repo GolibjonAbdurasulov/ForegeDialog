@@ -34,6 +34,7 @@ public class DataContext : DbContext
     public  DbSet<Tags> Tags { get; set; }
     public  DbSet<News> News { get; set; }
     public  DbSet<BlogModel> BlogModels { get; set; }
+    public  DbSet<Publisher> Publishers { get; set; }
 
 
     // private void TrackActionsAt()
