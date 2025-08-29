@@ -31,10 +31,12 @@ public class DataContext : DbContext
     public  DbSet<Statistics> Statistics { get; set; }
     public  DbSet<OurPartners> OurPartners { get; set; }
     public  DbSet<NewsCategory> NewsCategories { get; set; }
+    public  DbSet<ResourceCategory> ResourceCategories { get; set; }
     public  DbSet<Tags> Tags { get; set; }
     public  DbSet<News> News { get; set; }
     public  DbSet<BlogModel> BlogModels { get; set; }
     public  DbSet<Publisher> Publishers { get; set; }
+    public  DbSet<Resource> Resources { get; set; }
 
 
     // private void TrackActionsAt()
