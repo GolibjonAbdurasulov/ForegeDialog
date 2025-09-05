@@ -39,11 +39,11 @@ public class TagsController : ControllerBase
   
     [HttpPut]
     [Authorize]
-    public async Task<ResponseModelBase> UpdateAsync( NewsCategory dto)
+    public async Task<ResponseModelBase> UpdateAsync( Tags dto)
     {
         var res =  await TagsRepository.GetByIdAsync(dto.Id);
 
-        res.TagName = dto.CategoryName;
+        res.TagName = dto.TagName;
       
         await TagsRepository.UpdateAsync(res);
         return new ResponseModelBase(dto);

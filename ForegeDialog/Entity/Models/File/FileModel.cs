@@ -8,6 +8,6 @@ namespace Entity.Models.File;
 public class FileModel : ModelBase<Guid>
 {
     [Column("file_name")] public virtual string FileName { get; set; }
-    [Column("content_type")] public virtual string ContentType { get; set; }
+    [Column("content_type")] public string ContentType { get; set; }
     [Column("path")] public virtual string Path { get; set; }
 }

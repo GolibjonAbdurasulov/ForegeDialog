@@ -1,6 +1,7 @@
 using DatabaseBroker.Repositories.FileRepository;
 using DatabaseBroker.Repositories.ResourceRepository;
 using Entity.Models;
+using Entity.Models.File;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
@@ -34,11 +35,12 @@ public class ResourceController : ControllerBase
             PublishedDate = dto.PublishedDate,
             Size = dto.Size,
             FileId = dto.FileId,
+            File = new FileModel()
         };
         
         var resEntity=await ResourceRepository.AddAsync(entity);
-      
-        resEntity.FileType = resEntity.File.ContentType;
+        resEntity.File = await FileService.GetByIdAsync(dto.FileId);
+        resEntity.FileType = resEntity.File.ContentType.ToString();
         resEntity.Size = await GetResourceSize(resEntity.FileId);
         await ResourceRepository.UpdateAsync(resEntity);
         
