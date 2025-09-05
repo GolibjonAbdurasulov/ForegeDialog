@@ -25,6 +25,6 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Controllers\PublisherController\PublisherDtos\" />
-      <Folder Include="wwwroot\" />
+      <Folder Include="wwwroot\uploads\" />
     </ItemGroup>
 </Project>

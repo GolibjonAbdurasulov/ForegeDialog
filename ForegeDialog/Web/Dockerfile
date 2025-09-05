@@ -1,6 +1,7 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS base
 WORKDIR /app
 EXPOSE 80
+VOLUME ["/app/wwwroot/uploads"]
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS publish
 #in container
 ARG VARIABLE
