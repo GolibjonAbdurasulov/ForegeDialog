@@ -67,7 +67,7 @@ public class FileService : IFileService
 
     public async ValueTask<string> MakeFilePath(string filePath)
     {
-        var webRootFolder =  "wwwroot";
+        var webRootFolder =  "wwwroot/uploads";
         var path = Path.Combine(Directory.GetCurrentDirectory(), webRootFolder, filePath);
         return path;
     }

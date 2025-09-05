@@ -13,7 +13,7 @@ namespace Web.Controllers.FileController;
 public class FileController : ControllerBase
 {
     
-    private readonly IFileRepository _fileRepository;
+    public readonly IFileRepository _fileRepository;
     private readonly IFileService _fileService;
 
     public FileController(IFileRepository fileRepository, IFileService fileService)

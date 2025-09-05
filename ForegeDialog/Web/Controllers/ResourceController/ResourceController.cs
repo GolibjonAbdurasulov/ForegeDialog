@@ -14,11 +14,14 @@ namespace Web.Controllers.ResourceController;
 public class ResourceController : ControllerBase
 {
      public IResourceRepository ResourceRepository { get; set; }
+     public IFileRepository FileRepository { get; set; }
      public IFileService FileService { get; set; }
 
-    public ResourceController(IResourceRepository resourceRepository)
+    public ResourceController(IResourceRepository resourceRepository, IFileRepository fileRepository, IFileService fileService)
     {
         this.ResourceRepository = resourceRepository;
+        FileRepository = fileRepository;
+        FileService = fileService;
     }
 
    
@@ -38,9 +41,9 @@ public class ResourceController : ControllerBase
         };
         
         var resEntity=await ResourceRepository.AddAsync(entity);
-        resEntity.File = await FileService.GetByIdAsync(dto.FileId);
-        resEntity.FileType = resEntity.File.ContentType.ToString();
-        resEntity.Size = await GetResourceSize(resEntity.File.Id);
+        var file = await FileRepository.GetByIdAsync(dto.FileId);
+        resEntity.FileType = file.ContentType.ToString();
+        resEntity.Size = await GetResourceSize(dto.FileId);
         await ResourceRepository.UpdateAsync(resEntity);
         
         var resDto = new ResourceDto()
