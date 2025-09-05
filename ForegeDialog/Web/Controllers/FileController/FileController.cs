@@ -37,21 +37,21 @@ public class FileController : ControllerBase
         return (result, 200);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut]
     public async ValueTask<ResponseModelBase> ReplaceFileAsync(Guid id, IFormFile file)
     {
         var result = await _fileService.UpdateFileAsync(id, file);
         return (result, 200);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete]
     public async ValueTask<ResponseModelBase> DeleteAsync(Guid id)
     {
         var result = await _fileService.DeleteAsync(id);
         return (result, 200);
     }
     
-    [HttpGet("download/{id}")]
+    [HttpGet("download")]
     public async Task<IActionResult> DownloadFileAsync(Guid id)
     {
         try
@@ -68,6 +68,7 @@ public class FileController : ControllerBase
         {
             return NotFound();
         }
+        
         catch (Exception ex)
         {
             return StatusCode(500, "Ichki server xatosi: " + ex.Message);

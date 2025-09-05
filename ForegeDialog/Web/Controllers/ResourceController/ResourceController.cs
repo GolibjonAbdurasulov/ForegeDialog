@@ -35,13 +35,12 @@ public class ResourceController : ControllerBase
             PublishedDate = dto.PublishedDate,
             Size = dto.Size,
             FileId = dto.FileId,
-            File = new FileModel()
         };
         
         var resEntity=await ResourceRepository.AddAsync(entity);
         resEntity.File = await FileService.GetByIdAsync(dto.FileId);
         resEntity.FileType = resEntity.File.ContentType.ToString();
-        resEntity.Size = await GetResourceSize(resEntity.FileId);
+        resEntity.Size = await GetResourceSize(resEntity.File.Id);
         await ResourceRepository.UpdateAsync(resEntity);
         
         var resDto = new ResourceDto()
