@@ -71,9 +71,9 @@ public class StatisticsController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ResponseModelBase> GetByIdAsync(long id)
+    public async Task<ResponseModelBase> GetAsync()
     {
-        var res =  await StatisticsRepository.GetByIdAsync(id);
+        var res =   StatisticsRepository.GetAllAsQueryable().ToList()[0];
         var dto = new StatisticsDto
         {
             Id = res.Id,
