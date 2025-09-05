@@ -5,5 +5,5 @@ namespace Entity.Models;
 [Table("tags")]
 public class Tags : ModelBase<long>
 {
-    [Column("tag_name",TypeName = "jsonb")] public MultiLanguageField TagName { get; set; }   
+    [Column("category_name",TypeName = "jsonb")] public MultiLanguageField TagName { get; set; }   
 }
