@@ -11,3 +11,5 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     restart: always
+    volumes:
+      - ./uploads:/app/wwwroot/uploads
