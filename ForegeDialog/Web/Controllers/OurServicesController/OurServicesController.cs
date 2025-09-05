@@ -25,6 +25,7 @@ public class OurServicesController : ControllerBase
         {
             Title = dto.Title,
             Description = dto.Description,
+            PicturesId = dto.PicturesId,
         };
         var resEntity=await OurServiceRepository.AddAsync(entity);
         
@@ -33,6 +34,7 @@ public class OurServicesController : ControllerBase
             Id = resEntity.Id,
             Title = resEntity.Title,
             Description = resEntity.Description,
+            PicturesId = resEntity.PicturesId,
         };
         return new ResponseModelBase(resDto);
     }
@@ -46,6 +48,7 @@ public class OurServicesController : ControllerBase
         var res =  await OurServiceRepository.GetByIdAsync(dto.Id);
         res.Description = dto.Description;
         res.Title=dto.Title;
+        res.PicturesId=dto.PicturesId;
       
         await OurServiceRepository.UpdateAsync(res);
         return new ResponseModelBase(dto);
@@ -70,7 +73,8 @@ public class OurServicesController : ControllerBase
         {
             Id = res.Id,
             Title = res.Title,
-            Description = res.Description
+            Description = res.Description,
+            PicturesId = res.PicturesId,
         };
         return new ResponseModelBase(dto);
     }
@@ -86,7 +90,8 @@ public class OurServicesController : ControllerBase
             {
                 Id = question.Id,
                 Title = question.Title,
-                Description = question.Description
+                Description = question.Description,
+                PicturesId = question.PicturesId,
             });
         }
         
