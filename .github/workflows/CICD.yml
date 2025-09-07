@@ -9,8 +9,8 @@ jobs:
   Publish:
     runs-on: ubuntu-latest
     env:
-      DOCKER_USERNAME: golibjonabdurasulov
-      DOCKER_PASSWORD: dckr_pat_h45zNBIQWRW1tTM7CDESY0Q7-dU
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -20,7 +20,7 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
           docker compose push
 
   Deploy:
@@ -28,19 +28,19 @@ jobs:
     needs: Publish
     runs-on: eskiz_srv
     env:
-      DOCKER_USERNAME: golibjonabdurasulov
-      DOCKER_PASSWORD: dckr_pat_h45zNBIQWRW1tTM7CDESY0Q7-dU
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Deploy
         run: |
-            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
-            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker compose pull
-            docker compose down
-            docker compose --env-file .env up -d 
+          echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker compose pull
+          docker compose up -d --remove-orphans
