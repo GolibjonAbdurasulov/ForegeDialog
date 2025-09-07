@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 using DatabaseBroker;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -108,13 +110,28 @@ builder.Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureRepositories();
+builder.Services.AddMemoryCache();
 
+// Smtp sozlamalarni o‘qish
+var smtpConfig = builder.Configuration.GetSection("Smtp");
 
+// SmtpClient ni DI ga qo‘shish
+builder.Services.AddScoped<SmtpClient>(sp =>
+{
+    return new SmtpClient(smtpConfig["Host"], int.Parse(smtpConfig["Port"]))
+    {
+        Credentials = new NetworkCredential(smtpConfig["User"], smtpConfig["Password"]),
+        EnableSsl = true
+    };
+});
+
+builder.Services.ConfigureServicesFromTypeAssembly<OtpService>();
 builder.Services.ConfigureServicesFromTypeAssembly<UserService>();
 builder.Services.ConfigureServicesFromTypeAssembly<AuthService>();
 builder.Services.ConfigureServicesFromTypeAssembly<FileService>();
 builder.Services.ConfigureServicesFromTypeAssembly<TranslationService>();
 builder.Services.ConfigureServicesFromTypeAssembly<TokenService>();
+builder.Services.ConfigureServicesFromTypeAssembly<EmailNotificationService>();
 
 // Global xato boshqaruv middleware ni qo'shish
 builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
