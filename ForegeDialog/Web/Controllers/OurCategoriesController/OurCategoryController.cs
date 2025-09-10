@@ -44,7 +44,7 @@ public class OurCategoryController  : ControllerBase
   
     [HttpPut]
     [Authorize]
-    public async Task<ResponseModelBase> UpdateAsync( OurTeamDto dto)
+    public async Task<ResponseModelBase> UpdateAsync( OurCategoriesDto dto)
     {
         var res =  await OurCategoriesRepository.GetByIdAsync(dto.Id);
         res.Name = dto.Name;
