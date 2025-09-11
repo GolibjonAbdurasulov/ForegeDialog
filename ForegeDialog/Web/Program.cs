@@ -94,7 +94,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "https://new.foragedialog.uz",
-                "https://british-analytica-backoffice.vercel.app"
+                "https://british-analytica-backoffice.vercel.app",
+                "http://localhost:3000"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
