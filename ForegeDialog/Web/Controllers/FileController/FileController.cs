@@ -2,6 +2,7 @@ using DatabaseBroker.Extensions;
 using DatabaseBroker.Repositories.FileRepository;
 using Entity.Models.Common;
 using Entity.Models.File;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 using Web.Common;
@@ -25,6 +26,7 @@ public class FileController : ControllerBase
     [HttpGet,
      ProducesResponseType(typeof(ResponseModelBase<IEnumerable<FileModel>>), 200),
     ]
+    [AllowAnonymous]
     public async Task<ResponseModelBase> GetAllAsync([FromQuery] TermModelBase q)
     {
         return await _fileRepository.GetByTermsAsync(q);
@@ -52,6 +54,7 @@ public class FileController : ControllerBase
     }
     
     [HttpGet("download")]
+    [AllowAnonymous]
     public async Task<IActionResult> DownloadFileAsync(Guid id)
     {
         try
