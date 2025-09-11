@@ -25,7 +25,7 @@ builder.Services.AddDbContextPool<DataContext>(optionsBuilder =>
 });
 
 
-builder.WebHost.ConfigureKestrel(x => x.ListenAnyIP(80));
+builder.WebHost.ConfigureKestrel(x => x.ListenAnyIP(8080));
 
 builder
     .Services
