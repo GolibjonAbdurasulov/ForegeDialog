@@ -95,7 +95,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "https://new.foragedialog.uz",
                 "https://foragedialog-backoffice.vercel.app", // ⚠ front-end domeningiz
-                "http://localhost:3000",
+                "http://localhost:5173",
                 "https://british-analytica-backoffice.vercel.app"// local dev frontend
             )
             .AllowAnyHeader()
