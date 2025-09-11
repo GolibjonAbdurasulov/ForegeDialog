@@ -1,5 +1,3 @@
-
-
 services:
   web:
     image: ${DOCKER_USERNAME}/forege_dialog
