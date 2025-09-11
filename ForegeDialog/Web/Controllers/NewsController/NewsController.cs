@@ -1,4 +1,6 @@
 using DatabaseBroker.Repositories.NewsRepository;
+using DatabaseBroker.Repositories.ViewsRepository;
+using Entity.Models;
 using Entity.Models.Blog;
 using Entity.Models.News;
 using Microsoft.AspNetCore.Authorization;
@@ -10,9 +12,10 @@ using Web.Controllers.NewsController.NewsDtos;
 namespace Web.Controllers.NewsController;
 [ApiController]
 [Route("[controller]/[action]")]
-public class NewsController(INewsRepository newsRepository) : ControllerBase
+public class NewsController(INewsRepository newsRepository,IViewsRepository viewsRepository) : ControllerBase
 {
     private INewsRepository NewsRepository { get; set; } = newsRepository;
+    private IViewsRepository  ViewsRepository { get; set; } = viewsRepository;
 
     [HttpPost]
     [Authorize]
@@ -31,6 +34,12 @@ public class NewsController(INewsRepository newsRepository) : ControllerBase
             PublisherId = dto.PublisherId
         };
         var resEntity=await NewsRepository.AddAsync(entity);
+
+        await ViewsRepository.AddAsync(new Views
+        {
+            ItemId = resEntity.Id,
+            Count = 0
+        });
         
         var resDto = new NewsDto()
         {
@@ -43,7 +52,8 @@ public class NewsController(INewsRepository newsRepository) : ControllerBase
             Images = resEntity.Images,
             ReadingTime = resEntity.ReadingTime,
             PublishedDate = resEntity.PublishedDate,
-            PublisherId = resEntity.PublisherId
+            PublisherId = resEntity.PublisherId,
+            ViewsCount = 0
         };
         return new ResponseModelBase(resDto);
     }
@@ -84,6 +94,15 @@ public class NewsController(INewsRepository newsRepository) : ControllerBase
     public async Task<ResponseModelBase> GetByIdAsync(long id)
     {
         var res =  await NewsRepository.GetByIdAsync(id);
+        
+        var viewsCounter= ViewsRepository.GetAllAsQueryable().FirstOrDefault(item => item.ItemId == id);
+        int n = 0;
+        if (viewsCounter is not null)
+        {
+            ++viewsCounter.Count;
+            await ViewsRepository.UpdateAsync(viewsCounter);
+            n=viewsCounter.Count;
+        }
         var dto = new NewsDto
         {
             Id = res.Id,
@@ -95,7 +114,8 @@ public class NewsController(INewsRepository newsRepository) : ControllerBase
             Images = res.Images,
             ReadingTime = res.ReadingTime,
             PublishedDate = res.PublishedDate,
-            PublisherId = res.PublisherId
+            PublisherId = res.PublisherId,
+            ViewsCount = n
         };
         return new ResponseModelBase(dto);
     }
@@ -105,8 +125,13 @@ public class NewsController(INewsRepository newsRepository) : ControllerBase
     {
         var resNews =   NewsRepository.GetAllAsQueryable().ToList();
         List<NewsDto> dtos = new List<NewsDto>();
+        int n = 0;
         foreach (News res in resNews)
         {
+            var counter= ViewsRepository.GetAllAsQueryable().FirstOrDefault(item => item.ItemId == res.Id);
+         
+            if  (counter is not null) n=counter.Count;
+            
             dtos.Add(new NewsDto()
             {
                 Id = res.Id,
@@ -118,7 +143,8 @@ public class NewsController(INewsRepository newsRepository) : ControllerBase
                 Images=res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId
+                PublisherId = res.PublisherId,
+                ViewsCount = n
             });
         }
         

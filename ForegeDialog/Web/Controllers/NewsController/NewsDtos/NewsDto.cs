@@ -14,4 +14,5 @@ public class NewsDto
     public string ReadingTime{ get; set; }   
     public DateTime PublishedDate { get; set; } 
     public long PublisherId { get; set; }
+    public int ViewsCount { get; set; } 
 }

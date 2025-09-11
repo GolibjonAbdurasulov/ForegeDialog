@@ -1,4 +1,6 @@
 using DatabaseBroker.Repositories.BlogModelRepository;
+using DatabaseBroker.Repositories.ViewsRepository;
+using Entity.Models;
 using Entity.Models.Blog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +10,9 @@ using Web.Controllers.BlogController.BlogControllerDtos;
 namespace Web.Controllers.BlogController;
 [ApiController]
 [Route("[controller]/[action]")]
-public class BlogController(IBlogModelRepository blogModelRepository) : ControllerBase
+public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepository viewsRepository) : ControllerBase
 {
+    private IViewsRepository  ViewsRepository { get; set; } = viewsRepository;
     private IBlogModelRepository BlogModelRepository { get; set; } = blogModelRepository;
 
     [HttpPost]
@@ -29,6 +32,13 @@ public class BlogController(IBlogModelRepository blogModelRepository) : Controll
             PublisherId = dto.PublisherId
         };
         var resEntity=await BlogModelRepository.AddAsync(entity);
+        
+        
+        await ViewsRepository.AddAsync(new Views
+        {
+            ItemId = resEntity.Id,
+            Count = 0
+        });
         
         var resDto = new BlogDto
         {
@@ -82,6 +92,16 @@ public class BlogController(IBlogModelRepository blogModelRepository) : Controll
     public async Task<ResponseModelBase> GetByIdAsync(long id)
     {
         var res =  await BlogModelRepository.GetByIdAsync(id);
+        
+        var viewsCounter= ViewsRepository.GetAllAsQueryable().FirstOrDefault(item => item.ItemId == id);
+
+        int n=0;
+        if (viewsCounter is not null)
+        {
+            ++viewsCounter.Count;
+            await ViewsRepository.UpdateAsync(viewsCounter);
+            n = viewsCounter.Count;
+        }
         var dto = new BlogDto
         {
             Id = res.Id,
@@ -93,18 +113,23 @@ public class BlogController(IBlogModelRepository blogModelRepository) : Controll
             Images = res.Images,
             ReadingTime = res.ReadingTime,
             PublishedDate = res.PublishedDate,
-            PublisherId = res.PublisherId
+            PublisherId = res.PublisherId,
+            ViewsCount = n
         };
         return new ResponseModelBase(dto);
     }
     
-    [HttpGet]
     public async Task<ResponseModelBase> GetAllAsync()
     {
-        var resBlog =   BlogModelRepository.GetAllAsQueryable().ToList();
+        var resNews =   BlogModelRepository.GetAllAsQueryable().ToList();
         List<BlogDto> dtos = new List<BlogDto>();
-        foreach (BlogModel res in resBlog)
+        int n = 0;
+        foreach (BlogModel res in resNews)
         {
+            var counter= ViewsRepository.GetAllAsQueryable().FirstOrDefault(item => item.ItemId == res.Id);
+         
+            if  (counter is not null) n=counter.Count;
+            
             dtos.Add(new BlogDto()
             {
                 Id = res.Id,
@@ -113,15 +138,16 @@ public class BlogController(IBlogModelRepository blogModelRepository) : Controll
                 Text = res.Text,
                 Categories = res.Categories,
                 Tags = res.Tags,
-                Images = res.Images,
+                Images=res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId
+                PublisherId = res.PublisherId,
+                ViewsCount = n
             });
         }
         
         return new ResponseModelBase(dtos);
-    }   
+    }
     
     [HttpPost]
     public async Task<ResponseModelBase> GetByTagsAsync([FromBody]List<long> tagsIds)

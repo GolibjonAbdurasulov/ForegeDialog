@@ -21,6 +21,7 @@ public class DataContext : DbContext
     }
 
     public  DbSet<FileModel> Files { get; set; }
+    public  DbSet<Views> Views { get; set; }
     public  DbSet<Translation> Translations { get; set; }
     public  DbSet<User> Users { get; set; }
     public  DbSet<OurService> OurServices { get; set; }
