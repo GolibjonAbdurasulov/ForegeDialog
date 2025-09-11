@@ -87,23 +87,18 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontends", policy =>
+    options.AddPolicy("AllowAllWithCredentials", policy =>
     {
-        policy.WithOrigins(
-                "https://new.foragedialog.uz",
-                "https://foragedialog-backoffice.vercel.app", // ⚠ front-end domeningiz
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "https://british-analytica-backoffice.vercel.app"// local dev frontend
-            )
+        policy
+            .SetIsOriginAllowed(origin => true) // har qanday originga ruxsat
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); // cookie yoki JWT ishlatilsa
+            .AllowCredentials(); // JWT / cookie ishlaydi
     });
 });
+
 
 
 
@@ -154,7 +149,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 
-app.UseCors("AllowFrontends");
+app.UseCors("AllowAllWithCredentials");
 
 // Autentifikatsiya va ruxsat middleware larni qo'shish
 app.UseAuthentication();
