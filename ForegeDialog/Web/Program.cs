@@ -88,16 +88,16 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 
- builder.Services.AddCors(options =>
-    {
-        options.AddPolicy("AllowAllOrigins",
-            builder =>
-            {
-                builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
-            });
-    });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("https://british-analytica-backoffice.vercel.app") // 🔥 o'zingizning Vercel domeningiz
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
 
 
 builder.Services
@@ -142,7 +142,7 @@ var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 // HTTP so'rovlarini konfiguratsiya qilish
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseRouting();
 
 // Autentifikatsiya va ruxsat middleware larni qo'shish
@@ -159,7 +159,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseCors("AllowAllOrigins");
+app.UseCors("AllowFrontend");
+
 
 
 app.UseEndpoints(endpoints =>
