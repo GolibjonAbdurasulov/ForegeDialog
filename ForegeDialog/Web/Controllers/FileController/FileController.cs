@@ -53,7 +53,7 @@ public class FileController : ControllerBase
         return (result, 200);
     }
     
-    [HttpGet("download")]
+    [HttpGet("download/{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> DownloadFileAsync(Guid id)
     {
@@ -61,7 +61,7 @@ public class FileController : ControllerBase
         {
             var stream = await _fileService.SendFileAsync(id);
             var file = await _fileRepository.GetByIdAsync(id);
-            var contentType = "application/octet-stream"; // Fayl turi (MIME turi) ni aniqlash kerak
+            var contentType = "application/octet-stream"; // Fayl turi (MIME turi) ni aniqlash mumkin
             var fileName = Path.GetFileName(file.Path);
 
             // Fayl oqimini qaytarish
@@ -71,12 +71,12 @@ public class FileController : ControllerBase
         {
             return NotFound();
         }
-        
         catch (Exception ex)
         {
             return StatusCode(500, "Ichki server xatosi: " + ex.Message);
         }
     }
+
 
    
     
