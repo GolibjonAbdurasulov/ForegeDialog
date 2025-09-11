@@ -94,14 +94,16 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "https://new.foragedialog.uz",
-                "https://british-analytica-backoffice.vercel.app",
-                "http://localhost:3000"
+                "https://foragedialog-backoffice.vercel.app", // ⚠ front-end domeningiz
+                "http://localhost:3000",
+                "https://british-analytica-backoffice.vercel.app"// local dev frontend
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); // agar cookie yoki JWT ishlatilsa
+            .AllowCredentials(); // cookie yoki JWT ishlatilsa
     });
 });
+
 
 
 
@@ -147,11 +149,12 @@ var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 // HTTP so'rovlarini konfiguratsiya qilish
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseRouting();
 
 
 app.UseCors("AllowFrontends");
+
 // Autentifikatsiya va ruxsat middleware larni qo'shish
 app.UseAuthentication();
 app.UseAuthorization();
