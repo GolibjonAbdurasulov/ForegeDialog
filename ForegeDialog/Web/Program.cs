@@ -25,7 +25,7 @@ builder.Services.AddDbContextPool<DataContext>(optionsBuilder =>
 });
 
 
-builder.WebHost.ConfigureKestrel(x => x.ListenAnyIP(8080));
+builder.WebHost.ConfigureKestrel(x => x.ListenAnyIP(80));
 
 builder
     .Services
@@ -142,7 +142,7 @@ var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 // HTTP so'rovlarini konfiguratsiya qilish
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseRouting();
 
 // Autentifikatsiya va ruxsat middleware larni qo'shish
