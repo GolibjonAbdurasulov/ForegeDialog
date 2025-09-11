@@ -90,14 +90,18 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins("https://british-analytica-backoffice.vercel.app") // 🔥 o'zingizning Vercel domeningiz
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-        });
+    options.AddPolicy("AllowFrontends", policy =>
+    {
+        policy.WithOrigins(
+                "https://new.foragedialog.uz",
+                "https://british-analytica-backoffice.vercel.app"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // agar cookie yoki JWT ishlatilsa
+    });
 });
+
 
 
 builder.Services
@@ -145,6 +149,8 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 //app.UseHttpsRedirection();
 app.UseRouting();
 
+
+app.UseCors("AllowFrontends");
 // Autentifikatsiya va ruxsat middleware larni qo'shish
 app.UseAuthentication();
 app.UseAuthorization();
@@ -159,7 +165,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseCors("AllowFrontend");
 
 
 
