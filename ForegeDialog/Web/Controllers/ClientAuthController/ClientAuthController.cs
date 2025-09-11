@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Dtos;
 using Services.Interfaces;
@@ -12,6 +13,7 @@ public class ClientAuthController(IAuthService authService) : ControllerBase
     private IAuthService _authService = authService;
     
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ResponseModelBase> Login([FromBody]ClientLoginDto dto)
     {
         var res = await _authService.ClientLogin(dto);
@@ -19,6 +21,7 @@ public class ClientAuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ResponseModelBase> LogOut(long id)
     {
         var res = await _authService.ClientLogOut(id);
@@ -28,6 +31,7 @@ public class ClientAuthController(IAuthService authService) : ControllerBase
     
         
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ResponseModelBase> Registration(RegisterDto dto)
     {
         var res=await _authService.Registration(dto);

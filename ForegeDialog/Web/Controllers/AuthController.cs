@@ -21,6 +21,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ResponseModelBase> Login([FromBody]UserLoginDto dto)
     {
         var res = await _authService.Login(dto);
@@ -28,6 +29,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ResponseModelBase> LogOut(long id)
     {
         var res =await _authService.LogOut(id);
