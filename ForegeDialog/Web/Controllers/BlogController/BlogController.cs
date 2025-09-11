@@ -118,7 +118,7 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
         };
         return new ResponseModelBase(dto);
     }
-    
+    [HttpGet]
     public async Task<ResponseModelBase> GetAllAsync()
     {
         var resNews =   BlogModelRepository.GetAllAsQueryable().ToList();
