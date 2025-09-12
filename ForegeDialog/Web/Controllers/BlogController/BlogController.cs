@@ -1,19 +1,27 @@
 using DatabaseBroker.Repositories.BlogModelRepository;
+using DatabaseBroker.Repositories.NewsCategoryRepository;
+using DatabaseBroker.Repositories.TagsRepository;
 using DatabaseBroker.Repositories.ViewsRepository;
 using Entity.Models;
 using Entity.Models.Blog;
+using Entity.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Web.Common;
 using Web.Controllers.BlogController.BlogControllerDtos;
 
 namespace Web.Controllers.BlogController;
 [ApiController]
 [Route("[controller]/[action]")]
-public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepository viewsRepository) : ControllerBase
+public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepository viewsRepository, 
+    ITagsRepository TagsRepository,INewsCategoryRespository newsCategoryRepository) : ControllerBase
 {
     private IViewsRepository  ViewsRepository { get; set; } = viewsRepository;
     private IBlogModelRepository BlogModelRepository { get; set; } = blogModelRepository;
+    private ITagsRepository TagsRepository { get; set; } = TagsRepository;
+    private INewsCategoryRespository  NewsCategoryRepository { get; set; }=newsCategoryRepository;
+
 
     [HttpPost]
     [Authorize]
@@ -33,7 +41,9 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
         };
         var resEntity=await BlogModelRepository.AddAsync(entity);
         
-        
+        var tags = await GetTagsAsync(resEntity.Tags);
+        var categories=await GetCategoriesAsync(resEntity.Categories);
+
         await ViewsRepository.AddAsync(new Views
         {
             ItemId = resEntity.Id,
@@ -46,8 +56,10 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
             Subject = resEntity.Subject,
             Title = resEntity.Title,
             Text = resEntity.Text,
-            Categories = resEntity.Categories,
-            Tags = resEntity.Tags,
+            Categories = categories,
+            Tags = tags,            
+            CategoriesIds = resEntity.Categories,
+            TagsIds = resEntity.Tags,
             Images = resEntity.Images,
             ReadingTime = resEntity.ReadingTime,
             PublishedDate = resEntity.PublishedDate,
@@ -66,12 +78,13 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
         res.Subject = dto.Subject;
         res.Title = dto.Title;
         res.Text = dto.Text;
-        res.Categories = dto.Categories;
+        res.Categories = dto.CategoriesIds;
+        res.Tags = dto.TagsIds;
         res.ReadingTime = dto.ReadingTime;
         res.Images = dto.Images;
         res.PublishedDate = dto.PublishedDate;
         res.PublisherId = dto.PublisherId;
-        res.Tags = dto.Tags;
+
       
         await BlogModelRepository.UpdateAsync(res);
         return new ResponseModelBase(dto);
@@ -102,14 +115,19 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
             await ViewsRepository.UpdateAsync(viewsCounter);
             n = viewsCounter.Count;
         }
+        var tags = await GetTagsAsync(res.Tags);
+        var categories=await GetCategoriesAsync(res.Categories);
+
         var dto = new BlogDto
         {
             Id = res.Id,
             Subject = res.Subject,
             Title = res.Title,
             Text = res.Text,
-            Categories = res.Categories,
-            Tags = res.Tags,
+            Categories = categories,
+            Tags = tags,
+            TagsIds = res.Tags,
+            CategoriesIds = res.Categories,
             Images = res.Images,
             ReadingTime = res.ReadingTime,
             PublishedDate = res.PublishedDate,
@@ -123,12 +141,12 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
     {
         var resNews =   BlogModelRepository.GetAllAsQueryable().ToList();
         List<BlogDto> dtos = new List<BlogDto>();
-        int n = 0;
+
         foreach (BlogModel res in resNews)
         {
-            var counter= ViewsRepository.GetAllAsQueryable().FirstOrDefault(item => item.ItemId == res.Id);
-         
-            if  (counter is not null) n=counter.Count;
+            var tags = await GetTagsAsync(res.Tags);
+            var categories=await GetCategoriesAsync(res.Categories);
+
             
             dtos.Add(new BlogDto()
             {
@@ -136,34 +154,58 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
                 Subject = res.Subject,
                 Title = res.Title,
                 Text = res.Text,
-                Categories = res.Categories,
-                Tags = res.Tags,
+                TagsIds = res.Categories,
+                CategoriesIds = res.Tags,
+                Tags = tags,
+                Categories = categories,
                 Images=res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
                 PublisherId = res.PublisherId,
-                ViewsCount = n
+
             });
         }
         
         return new ResponseModelBase(dtos);
     }
     
-    [HttpPost]
+    private async Task<List<MultiLanguageField>> GetTagsAsync(List<long> tagsIds)
+    {
+        if (tagsIds == null || tagsIds.Count == 0)
+            throw new ArgumentException("tagsIds bo'sh bo'lishi mumkin emas.", nameof(tagsIds));
+
+        return await TagsRepository.GetAllAsQueryable()
+            .Where(tag => tagsIds.Contains(tag.Id))
+            .Select(tag => tag.TagName)
+            .ToListAsync();
+    }
+
+    private async Task<List<MultiLanguageField>> GetCategoriesAsync(List<long> categoryIds)
+    {
+        if (categoryIds == null || categoryIds.Count == 0)
+            throw new ArgumentException("categoryIds bo'sh bo'lishi mumkin emas.", nameof(categoryIds));
+
+        return await NewsCategoryRepository.GetAllAsQueryable()
+            .Where(category => categoryIds.Contains(category.Id))
+            .Select(category => category.CategoryName)
+            .ToListAsync();
+    }
+    
+   /* [HttpPost]
     public async Task<ResponseModelBase> GetByTagsAsync([FromBody]List<long> tagsIds)
     {
-        var res = await GetNewsWithTags(tagsIds);
+        var res = await GetBlogWithTags(tagsIds);
         return new ResponseModelBase(res);
     }
     
     [HttpPost]
     public async Task<ResponseModelBase> GetByCategoriesAsync([FromBody]List<long> categoryIds)
     {
-        var res = await GetNewsWithCategory(categoryIds);
+        var res = await GetBlogWithCategory(categoryIds);
         return new ResponseModelBase(res);
     }
     
-    private async Task<List<BlogDto>> GetNewsWithTags(List<long> tagsIds)
+    private async Task<List<BlogDto>> GetBlogWithTags(List<long> tagsIds)
     {
         var allBlogs = BlogModelRepository.GetAllAsQueryable().ToList();
         
@@ -192,7 +234,7 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
     }
     
     
-    private async Task<List<BlogDto>> GetNewsWithCategory(List<long> categoryIds)
+    private async Task<List<BlogDto>> GetBlogWithCategory(List<long> categoryIds)
     {
         var allBlog = BlogModelRepository.GetAllAsQueryable().ToList();
         
@@ -218,7 +260,7 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
             });
         }
         return dtos;
-    }
+    }*/
 
     
 }

@@ -8,8 +8,11 @@ public class BlogDto
     public MultiLanguageField Subject { get; set; }   
     public MultiLanguageField Title { get; set; }   
     public MultiLanguageField Text { get; set; }   
-    public List<long> Categories { get; set; }   
-    public List<long> Tags { get; set; } 
+    public List<MultiLanguageField> Categories { get; set; }   
+    public List<MultiLanguageField> Tags { get; set; }
+
+    public List<long> CategoriesIds { get; set; }   
+    public List<long> TagsIds { get; set; }
     public List<Guid> Images{ get; set; }
     public string ReadingTime{ get; set; }   
     public DateTime PublishedDate { get; set; } 

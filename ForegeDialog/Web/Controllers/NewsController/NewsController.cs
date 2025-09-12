@@ -58,14 +58,15 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             Title = resEntity.Title,
             Text = resEntity.Text,
             Categories = categories,
-            Tags = tags,
+            Tags = tags,            
+            CategoriesIds = resEntity.Categories,
+            TagsIds = resEntity.Tags,
             Images = resEntity.Images,
             ReadingTime = resEntity.ReadingTime,
             PublishedDate = resEntity.PublishedDate,
             PublisherId = resEntity.PublisherId,
             ViewsCount = 0,
-            CategoriesIds = resEntity.Categories,
-            TagsIds = resEntity.Tags
+
         };
         return new ResponseModelBase(resDto);
     }
@@ -130,13 +131,14 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             Text = res.Text,
             Categories = categories,
             Tags = tags,
+            TagsIds = res.Tags,
+            CategoriesIds = res.Categories,
             Images = res.Images,
             ReadingTime = res.ReadingTime,
             PublishedDate = res.PublishedDate,
             PublisherId = res.PublisherId,
             ViewsCount = n,
-            TagsIds = res.Tags,
-            CategoriesIds = res.Categories
+
         };
         return new ResponseModelBase(dto);
     }
@@ -161,12 +163,13 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
                 Text = res.Text,
                 TagsIds = res.Categories,
                 CategoriesIds = res.Tags,
+                Tags = tags,
+                Categories = categories,
                 Images=res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
                 PublisherId = res.PublisherId,
-                Tags = tags,
-                Categories = categories
+
             });
         }
         
