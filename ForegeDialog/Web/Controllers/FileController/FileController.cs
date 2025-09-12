@@ -76,6 +76,25 @@ public class FileController : ControllerBase
         }
     }
 
+    
+    [HttpPost]
+    [RequestSizeLimit(300_000_000)] // 300 MB limit
+    [RequestFormLimits(MultipartBodyLengthLimit = 300_000_000)]
+    public async Task<ResponseModelBase> UploadLargeFileAsync(IFormFile file)
+    {
+        if (file == null)
+            return new ResponseModelBase("Fayl yuborilmadi", System.Net.HttpStatusCode.BadRequest);
+
+        try
+        {
+            var result = await _fileService.UploadFileAsync(file);
+            return new ResponseModelBase(result);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseModelBase(ex);
+        }
+    }
 
    
     
