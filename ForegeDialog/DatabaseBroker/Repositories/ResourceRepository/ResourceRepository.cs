@@ -6,4 +6,4 @@ using Microsoft.EntityFrameworkCore;
 namespace DatabaseBroker.Repositories.ResourceRepository;
 [Injectable]
 public class ResourceRepository(DataContext dbContext) : 
-    RepositoryBase<Resource, long>(dbContext), IResourceRepository;
+    RepositoryBase<Resources, long>(dbContext), IResourceRepository;

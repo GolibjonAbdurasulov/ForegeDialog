@@ -8,7 +8,11 @@ public class ResourceDto
    public MultiLanguageField FileName { get; set; }
    public string FileType { get; set; }
    public MultiLanguageField Subject { get; set; }
+   public long ResourceCategoryId { get; set; }
    public DateTime PublishedDate { get; set; }
-   public string Size { get; set; }
-   public Guid FileId { get; set; }
+   public MultiLanguageField Size { get; set; }
+   public Guid FileIdUZ { get; set; }
+   public Guid FileIdRU { get; set; }
+   public Guid FileIdEN { get; set; }
+   public Guid FileIdGER { get; set; }
 }

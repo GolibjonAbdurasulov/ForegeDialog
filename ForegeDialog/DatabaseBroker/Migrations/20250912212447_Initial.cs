@@ -267,30 +267,6 @@ namespace DatabaseBroker.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "resource",
-                columns: table => new
-                {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    file_name = table.Column<MultiLanguageField>(type: "jsonb", nullable: false),
-                    file_type = table.Column<string>(type: "text", nullable: true),
-                    subject = table.Column<MultiLanguageField>(type: "jsonb", nullable: false),
-                    published_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    size = table.Column<string>(type: "text", nullable: true),
-                    file_id = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_resource", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_resource_file_model_file_id",
-                        column: x => x.file_id,
-                        principalTable: "file_model",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "blog_models",
                 columns: table => new
                 {
@@ -344,6 +320,58 @@ namespace DatabaseBroker.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "resources",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    file_name = table.Column<MultiLanguageField>(type: "jsonb", nullable: false),
+                    file_type = table.Column<string>(type: "text", nullable: true),
+                    subject = table.Column<MultiLanguageField>(type: "jsonb", nullable: false),
+                    resource_category_id = table.Column<long>(type: "bigint", nullable: false),
+                    published_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    size = table.Column<MultiLanguageField>(type: "jsonb", nullable: true),
+                    file_id_uz = table.Column<Guid>(type: "uuid", nullable: false),
+                    file_id_ru = table.Column<Guid>(type: "uuid", nullable: false),
+                    file_id_en = table.Column<Guid>(type: "uuid", nullable: false),
+                    file_id_ger = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_resources", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_resources_file_model_file_id_en",
+                        column: x => x.file_id_en,
+                        principalTable: "file_model",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_resources_file_model_file_id_ger",
+                        column: x => x.file_id_ger,
+                        principalTable: "file_model",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_resources_file_model_file_id_ru",
+                        column: x => x.file_id_ru,
+                        principalTable: "file_model",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_resources_file_model_file_id_uz",
+                        column: x => x.file_id_uz,
+                        principalTable: "file_model",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_resources_resourceCategory_resource_category_id",
+                        column: x => x.resource_category_id,
+                        principalTable: "resourceCategory",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_blog_models_publisher_id",
                 table: "blog_models",
@@ -365,9 +393,29 @@ namespace DatabaseBroker.Migrations
                 column: "pictures_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_resource_file_id",
-                table: "resource",
-                column: "file_id");
+                name: "IX_resources_file_id_en",
+                table: "resources",
+                column: "file_id_en");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_resources_file_id_ger",
+                table: "resources",
+                column: "file_id_ger");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_resources_file_id_ru",
+                table: "resources",
+                column: "file_id_ru");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_resources_file_id_uz",
+                table: "resources",
+                column: "file_id_uz");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_resources_resource_category_id",
+                table: "resources",
+                column: "resource_category_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_translations_code",
@@ -410,10 +458,7 @@ namespace DatabaseBroker.Migrations
                 name: "OurServices");
 
             migrationBuilder.DropTable(
-                name: "resource");
-
-            migrationBuilder.DropTable(
-                name: "resourceCategory");
+                name: "resources");
 
             migrationBuilder.DropTable(
                 name: "statistics");
@@ -435,6 +480,9 @@ namespace DatabaseBroker.Migrations
 
             migrationBuilder.DropTable(
                 name: "file_model");
+
+            migrationBuilder.DropTable(
+                name: "resourceCategory");
         }
     }
 }

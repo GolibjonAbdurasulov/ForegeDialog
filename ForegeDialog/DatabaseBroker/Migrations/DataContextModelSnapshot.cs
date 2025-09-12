@@ -397,48 +397,6 @@ namespace DatabaseBroker.Migrations
                     b.ToTable("our_valued_clients");
                 });
 
-            modelBuilder.Entity("Entity.Models.Resource", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<Guid>("FileId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("file_id");
-
-                    b.Property<MultiLanguageField>("FileName")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("file_name");
-
-                    b.Property<string>("FileType")
-                        .HasColumnType("text")
-                        .HasColumnName("file_type");
-
-                    b.Property<DateTime>("PublishedDate")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("published_date");
-
-                    b.Property<string>("Size")
-                        .HasColumnType("text")
-                        .HasColumnName("size");
-
-                    b.Property<MultiLanguageField>("Subject")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("subject");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FileId");
-
-                    b.ToTable("resource");
-                });
-
             modelBuilder.Entity("Entity.Models.ResourceCategory", b =>
                 {
                     b.Property<long>("Id")
@@ -455,6 +413,72 @@ namespace DatabaseBroker.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("resourceCategory");
+                });
+
+            modelBuilder.Entity("Entity.Models.Resources", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid>("FileIdEN")
+                        .HasColumnType("uuid")
+                        .HasColumnName("file_id_en");
+
+                    b.Property<Guid>("FileIdGER")
+                        .HasColumnType("uuid")
+                        .HasColumnName("file_id_ger");
+
+                    b.Property<Guid>("FileIdRU")
+                        .HasColumnType("uuid")
+                        .HasColumnName("file_id_ru");
+
+                    b.Property<Guid>("FileIdUZ")
+                        .HasColumnType("uuid")
+                        .HasColumnName("file_id_uz");
+
+                    b.Property<MultiLanguageField>("FileName")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("file_name");
+
+                    b.Property<string>("FileType")
+                        .HasColumnType("text")
+                        .HasColumnName("file_type");
+
+                    b.Property<DateTime>("PublishedDate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("published_date");
+
+                    b.Property<long>("ResourceCategoryId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("resource_category_id");
+
+                    b.Property<MultiLanguageField>("Size")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("size");
+
+                    b.Property<MultiLanguageField>("Subject")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("subject");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileIdEN");
+
+                    b.HasIndex("FileIdGER");
+
+                    b.HasIndex("FileIdRU");
+
+                    b.HasIndex("FileIdUZ");
+
+                    b.HasIndex("ResourceCategoryId");
+
+                    b.ToTable("resources");
                 });
 
             modelBuilder.Entity("Entity.Models.Statistics", b =>
@@ -646,15 +670,47 @@ namespace DatabaseBroker.Migrations
                     b.Navigation("Pictures");
                 });
 
-            modelBuilder.Entity("Entity.Models.Resource", b =>
+            modelBuilder.Entity("Entity.Models.Resources", b =>
                 {
-                    b.HasOne("Entity.Models.File.FileModel", "File")
+                    b.HasOne("Entity.Models.File.FileModel", "FileEN")
                         .WithMany()
-                        .HasForeignKey("FileId")
+                        .HasForeignKey("FileIdEN")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("File");
+                    b.HasOne("Entity.Models.File.FileModel", "FileGER")
+                        .WithMany()
+                        .HasForeignKey("FileIdGER")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.File.FileModel", "FileRU")
+                        .WithMany()
+                        .HasForeignKey("FileIdRU")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.File.FileModel", "FileUZ")
+                        .WithMany()
+                        .HasForeignKey("FileIdUZ")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Models.ResourceCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("ResourceCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("FileEN");
+
+                    b.Navigation("FileGER");
+
+                    b.Navigation("FileRU");
+
+                    b.Navigation("FileUZ");
                 });
 #pragma warning restore 612, 618
         }

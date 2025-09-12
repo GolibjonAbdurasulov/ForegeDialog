@@ -3,7 +3,7 @@ using Entity.Models;
 
 namespace DatabaseBroker.Repositories.ResourceRepository;
 
-public interface IResourceRepository : IRepositoryBase<Resource,long>
+public interface IResourceRepository : IRepositoryBase<Resources,long>
 {
     
 }
