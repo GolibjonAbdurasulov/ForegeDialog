@@ -1,10 +1,14 @@
+using DatabaseBroker.Repositories.NewsCategoryRepository;
 using DatabaseBroker.Repositories.NewsRepository;
+using DatabaseBroker.Repositories.TagsRepository;
 using DatabaseBroker.Repositories.ViewsRepository;
 using Entity.Models;
 using Entity.Models.Blog;
+using Entity.Models.Common;
 using Entity.Models.News;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Web.Common;
 using Web.Controllers.BlogController.BlogControllerDtos;
 using Web.Controllers.NewsController.NewsDtos;
@@ -12,10 +16,13 @@ using Web.Controllers.NewsController.NewsDtos;
 namespace Web.Controllers.NewsController;
 [ApiController]
 [Route("[controller]/[action]")]
-public class NewsController(INewsRepository newsRepository,IViewsRepository viewsRepository) : ControllerBase
+public class NewsController(INewsRepository newsRepository,IViewsRepository viewsRepository,
+    ITagsRepository TagsRepository,INewsCategoryRespository newsCategoryRepository) : ControllerBase
 {
     private INewsRepository NewsRepository { get; set; } = newsRepository;
     private IViewsRepository  ViewsRepository { get; set; } = viewsRepository;
+    private ITagsRepository TagsRepository { get; set; } = TagsRepository;
+    private INewsCategoryRespository  NewsCategoryRepository { get; set; }=newsCategoryRepository;
 
     [HttpPost]
     [Authorize]
@@ -40,6 +47,9 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             ItemId = resEntity.Id,
             Count = 0
         });
+
+        var tags = await GetTagsAsync(resEntity.Tags);
+        var categories=await GetCategoriesAsync(resEntity.Categories);
         
         var resDto = new NewsDto()
         {
@@ -47,13 +57,15 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             Subject = resEntity.Subject,
             Title = resEntity.Title,
             Text = resEntity.Text,
-            Categories = resEntity.Categories,
-            Tags = resEntity.Tags,
+            Categories = categories,
+            Tags = tags,
             Images = resEntity.Images,
             ReadingTime = resEntity.ReadingTime,
             PublishedDate = resEntity.PublishedDate,
             PublisherId = resEntity.PublisherId,
-            ViewsCount = 0
+            ViewsCount = 0,
+            CategoriesIds = resEntity.Categories,
+            TagsIds = resEntity.Tags
         };
         return new ResponseModelBase(resDto);
     }
@@ -68,11 +80,14 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
         res.Subject = dto.Subject;
         res.Title = dto.Title;
         res.Text = dto.Text;
-        res.Categories = dto.Categories;
+        var tags = await GetTagsAsync(res.Tags);
+        var categories=await GetCategoriesAsync(res.Categories);
+
+        res.Categories = dto.CategoriesIds;
+        res.Tags = dto.TagsIds;
         res.ReadingTime = dto.ReadingTime;
         res.PublishedDate = dto.PublishedDate;
         res.PublisherId = dto.PublisherId;
-        res.Tags = dto.Tags;
         res.Images = dto.Images;
       
         await NewsRepository.UpdateAsync(res);
@@ -103,19 +118,25 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             await ViewsRepository.UpdateAsync(viewsCounter);
             n=viewsCounter.Count;
         }
+        
+        var tags = await GetTagsAsync(res.Tags);
+        var categories=await GetCategoriesAsync(res.Categories);
+
         var dto = new NewsDto
         {
             Id = res.Id,
             Subject = res.Subject,
             Title = res.Title,
             Text = res.Text,
-            Categories = res.Categories,
-            Tags = res.Tags,
+            Categories = categories,
+            Tags = tags,
             Images = res.Images,
             ReadingTime = res.ReadingTime,
             PublishedDate = res.PublishedDate,
             PublisherId = res.PublisherId,
-            ViewsCount = n
+            ViewsCount = n,
+            TagsIds = res.Tags,
+            CategoriesIds = res.Categories
         };
         return new ResponseModelBase(dto);
     }
@@ -125,12 +146,12 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
     {
         var resNews =   NewsRepository.GetAllAsQueryable().ToList();
         List<NewsDto> dtos = new List<NewsDto>();
-        int n = 0;
+
         foreach (News res in resNews)
         {
-            var counter= ViewsRepository.GetAllAsQueryable().FirstOrDefault(item => item.ItemId == res.Id);
-         
-            if  (counter is not null) n=counter.Count;
+            var tags = await GetTagsAsync(res.Tags);
+            var categories=await GetCategoriesAsync(res.Categories);
+
             
             dtos.Add(new NewsDto()
             {
@@ -138,20 +159,21 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
                 Subject = res.Subject,
                 Title = res.Title,
                 Text = res.Text,
-                Categories = res.Categories,
-                Tags = res.Tags,
+                TagsIds = res.Categories,
+                CategoriesIds = res.Tags,
                 Images=res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
                 PublisherId = res.PublisherId,
-                ViewsCount = n
+                Tags = tags,
+                Categories = categories
             });
         }
         
         return new ResponseModelBase(dtos);
     }
 
-    [HttpPost]
+   /* [HttpPost]
     public async Task<ResponseModelBase> GetByTagsAsync([FromBody] List<long> tagsIds)
     {
         var res = await GetNewsWithTags(tagsIds);
@@ -220,6 +242,28 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             });
         }
         return dtos;
+    }*/
+    private async Task<List<MultiLanguageField>> GetTagsAsync(List<long> tagsIds)
+    {
+        if (tagsIds == null || tagsIds.Count == 0)
+            throw new ArgumentException("tagsIds bo'sh bo'lishi mumkin emas.", nameof(tagsIds));
+
+        return await TagsRepository.GetAllAsQueryable()
+            .Where(tag => tagsIds.Contains(tag.Id))
+            .Select(tag => tag.TagName)
+            .ToListAsync();
     }
+
+    private async Task<List<MultiLanguageField>> GetCategoriesAsync(List<long> categoryIds)
+    {
+        if (categoryIds == null || categoryIds.Count == 0)
+            throw new ArgumentException("categoryIds bo'sh bo'lishi mumkin emas.", nameof(categoryIds));
+
+        return await NewsCategoryRepository.GetAllAsQueryable()
+            .Where(category => categoryIds.Contains(category.Id))
+            .Select(category => category.CategoryName)
+            .ToListAsync();
+    }
+
 
 }
