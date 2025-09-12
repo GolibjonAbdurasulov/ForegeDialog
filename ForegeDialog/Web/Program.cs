@@ -58,7 +58,7 @@ builder
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "https://foregedialog", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "https://foragedialog.uz", Version = "v1" });
 
   
     options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
@@ -151,11 +151,9 @@ app.UseRouting();
 
 app.UseCors("AllowAllOrigins");
 
-// Autentifikatsiya va ruxsat middleware larni qo'shish
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Raqamlarni tayyorlash
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
