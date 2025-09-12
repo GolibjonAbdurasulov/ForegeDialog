@@ -89,15 +89,15 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllWithCredentials", policy =>
+    options.AddPolicy("AllowAllOrigins", policy =>
     {
         policy
-            .SetIsOriginAllowed(origin => true) // har qanday originga ruxsat
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // JWT / cookie ishlaydi
+            .AllowAnyOrigin()      
+            .AllowAnyHeader()      
+            .AllowAnyMethod();     
     });
 });
+
 
 
 
@@ -149,7 +149,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 
-app.UseCors("AllowAllWithCredentials");
+app.UseCors("AllowAllOrigins");
 
 // Autentifikatsiya va ruxsat middleware larni qo'shish
 app.UseAuthentication();

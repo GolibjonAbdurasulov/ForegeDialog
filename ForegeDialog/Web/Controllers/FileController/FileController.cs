@@ -61,10 +61,9 @@ public class FileController : ControllerBase
         {
             var stream = await _fileService.SendFileAsync(id);
             var file = await _fileRepository.GetByIdAsync(id);
-            var contentType = "application/octet-stream"; // Fayl turi (MIME turi) ni aniqlash mumkin
+            var contentType = "application/octet-stream"; 
             var fileName = Path.GetFileName(file.Path);
-
-            // Fayl oqimini qaytarish
+            
             return File(stream, contentType, fileName);
         }
         catch (FileNotFoundException)
