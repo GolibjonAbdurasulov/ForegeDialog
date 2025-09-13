@@ -191,6 +191,75 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
             .ToListAsync();
     }
     
+    [HttpGet]
+    public async Task<ResponseModelBase> GetAllByNewestAsync()
+    {
+        var resBlog = BlogModelRepository.GetAllAsQueryable()
+            .OrderByDescending(n => n.PublishedDate)  // yangi birinchi
+            .ToList();
+
+        List<BlogDto> dtos = new List<BlogDto>();
+
+        foreach (BlogModel res in resBlog)
+        {
+            var tags = await GetTagsAsync(res.Tags);
+            var categories = await GetCategoriesAsync(res.Categories);
+
+            dtos.Add(new BlogDto()
+            {
+                Id = res.Id,
+                Subject = res.Subject,
+                Title = res.Title,
+                Text = res.Text,
+                TagsIds = res.Tags,
+                CategoriesIds = res.Categories,
+                Tags = tags,
+                Categories = categories,
+                Images = res.Images,
+                ReadingTime = res.ReadingTime,
+                PublishedDate = res.PublishedDate,
+                PublisherId = res.PublisherId
+            });
+        }
+
+        return new ResponseModelBase(dtos);
+    }
+
+    [HttpGet]
+    public async Task<ResponseModelBase> GetAllByOldestAsync()
+    {
+        var resBlog = BlogModelRepository.GetAllAsQueryable()
+            .OrderBy(n => n.PublishedDate)  // eski birinchi
+            .ToList();
+
+        List<BlogDto> dtos = new List<BlogDto>();
+
+        foreach (BlogModel res in resBlog)
+        {
+            var tags = await GetTagsAsync(res.Tags);
+            var categories = await GetCategoriesAsync(res.Categories);
+
+            dtos.Add(new BlogDto()
+            {
+                Id = res.Id,
+                Subject = res.Subject,
+                Title = res.Title,
+                Text = res.Text,
+                TagsIds = res.Tags,
+                CategoriesIds = res.Categories,
+                Tags = tags,
+                Categories = categories,
+                Images = res.Images,
+                ReadingTime = res.ReadingTime,
+                PublishedDate = res.PublishedDate,
+                PublisherId = res.PublisherId
+            });
+        }
+
+        return new ResponseModelBase(dtos);
+    }
+
+    
    /* [HttpPost]
     public async Task<ResponseModelBase> GetByTagsAsync([FromBody]List<long> tagsIds)
     {

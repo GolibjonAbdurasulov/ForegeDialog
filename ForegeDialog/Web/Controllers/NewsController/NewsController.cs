@@ -268,5 +268,73 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             .ToListAsync();
     }
 
+    
+    [HttpGet]
+    public async Task<ResponseModelBase> GetAllByNewestAsync()
+    {
+        var resNews = NewsRepository.GetAllAsQueryable()
+            .OrderByDescending(n => n.PublishedDate)  
+            .ToList();
+
+        List<NewsDto> dtos = new List<NewsDto>();
+
+        foreach (News res in resNews)
+        {
+            var tags = await GetTagsAsync(res.Tags);
+            var categories = await GetCategoriesAsync(res.Categories);
+
+            dtos.Add(new NewsDto()
+            {
+                Id = res.Id,
+                Subject = res.Subject,
+                Title = res.Title,
+                Text = res.Text,
+                TagsIds = res.Tags,
+                CategoriesIds = res.Categories,
+                Tags = tags,
+                Categories = categories,
+                Images = res.Images,
+                ReadingTime = res.ReadingTime,
+                PublishedDate = res.PublishedDate,
+                PublisherId = res.PublisherId
+            });
+        }
+
+        return new ResponseModelBase(dtos);
+    }
+
+    [HttpGet]
+    public async Task<ResponseModelBase> GetAllByOldestAsync()
+    {
+        var resNews = NewsRepository.GetAllAsQueryable()
+            .OrderBy(n => n.PublishedDate)  
+            .ToList();
+
+        List<NewsDto> dtos = new List<NewsDto>();
+
+        foreach (News res in resNews)
+        {
+            var tags = await GetTagsAsync(res.Tags);
+            var categories = await GetCategoriesAsync(res.Categories);
+
+            dtos.Add(new NewsDto()
+            {
+                Id = res.Id,
+                Subject = res.Subject,
+                Title = res.Title,
+                Text = res.Text,
+                TagsIds = res.Tags,
+                CategoriesIds = res.Categories,
+                Tags = tags,
+                Categories = categories,
+                Images = res.Images,
+                ReadingTime = res.ReadingTime,
+                PublishedDate = res.PublishedDate,
+                PublisherId = res.PublisherId
+            });
+        }
+
+        return new ResponseModelBase(dtos);
+    }
 
 }
