@@ -154,7 +154,8 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             var tags = await GetTagsAsync(res.Tags);
             var categories=await GetCategoriesAsync(res.Categories);
 
-            
+            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
+
             dtos.Add(new NewsDto()
             {
                 Id = res.Id,
@@ -169,7 +170,7 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
                 PublisherId = res.PublisherId,
-
+                ViewsCount = n
             });
         }
         
@@ -282,6 +283,7 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
         {
             var tags = await GetTagsAsync(res.Tags);
             var categories = await GetCategoriesAsync(res.Categories);
+            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
 
             dtos.Add(new NewsDto()
             {
@@ -296,7 +298,8 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
                 Images = res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId
+                PublisherId = res.PublisherId,
+                ViewsCount = n
             });
         }
 
@@ -316,6 +319,7 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
         {
             var tags = await GetTagsAsync(res.Tags);
             var categories = await GetCategoriesAsync(res.Categories);
+            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
 
             dtos.Add(new NewsDto()
             {
@@ -330,7 +334,8 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
                 Images = res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId
+                PublisherId = res.PublisherId,
+                ViewsCount = n
             });
         }
 

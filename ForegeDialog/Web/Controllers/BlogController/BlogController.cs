@@ -147,6 +147,8 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
             var tags = await GetTagsAsync(res.Tags);
             var categories=await GetCategoriesAsync(res.Categories);
 
+            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
+
             
             dtos.Add(new BlogDto()
             {
@@ -162,6 +164,7 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
                 PublisherId = res.PublisherId,
+                ViewsCount = n
 
             });
         }
@@ -204,6 +207,7 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
         {
             var tags = await GetTagsAsync(res.Tags);
             var categories = await GetCategoriesAsync(res.Categories);
+            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
 
             dtos.Add(new BlogDto()
             {
@@ -218,7 +222,8 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
                 Images = res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId
+                PublisherId = res.PublisherId,
+                ViewsCount = n
             });
         }
 
@@ -238,7 +243,7 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
         {
             var tags = await GetTagsAsync(res.Tags);
             var categories = await GetCategoriesAsync(res.Categories);
-
+            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
             dtos.Add(new BlogDto()
             {
                 Id = res.Id,
@@ -252,7 +257,8 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
                 Images = res.Images,
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId
+                PublisherId = res.PublisherId,
+                ViewsCount = n
             });
         }
 
