@@ -1,9 +1,8 @@
 using DatabaseBroker.Repositories.Common;
 using Entity.Attributes;
 using Entity.Models;
-using Microsoft.EntityFrameworkCore;
 
-namespace DatabaseBroker.PicturesModelRepository;
+namespace DatabaseBroker.Repositories.PicturesModelRepository;
 [Injectable]
 public class PicturesModelRepository : RepositoryBase<PicturesModel,long>, IPicturesModelRepository
 {

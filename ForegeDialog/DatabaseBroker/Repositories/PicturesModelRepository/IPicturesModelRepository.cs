@@ -1,7 +1,7 @@
 using DatabaseBroker.Repositories.Common;
 using Entity.Models;
 
-namespace DatabaseBroker.PicturesModelRepository;
+namespace DatabaseBroker.Repositories.PicturesModelRepository;
 
 public interface IPicturesModelRepository : IRepositoryBase<PicturesModel,long>
 {

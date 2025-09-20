@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DatabaseBroker.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250912212447_Initial")]
-    partial class Initial
+    [Migration("20250920055658_AddImageTablesBugFix")]
+    partial class AddImageTablesBugFix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -134,6 +134,46 @@ namespace DatabaseBroker.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("file_model");
+                });
+
+            modelBuilder.Entity("Entity.Models.ImageCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<MultiLanguageField>("Category")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("category");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("image_category");
+                });
+
+            modelBuilder.Entity("Entity.Models.ImageModel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("FileId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_id");
+
+                    b.Property<string>("ImageName")
+                        .HasColumnType("text")
+                        .HasColumnName("image_name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("image_model");
                 });
 
             modelBuilder.Entity("Entity.Models.News.News", b =>
@@ -400,6 +440,30 @@ namespace DatabaseBroker.Migrations
                     b.ToTable("our_valued_clients");
                 });
 
+            modelBuilder.Entity("Entity.Models.PicturesModel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CategoryId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("category_id");
+
+                    b.Property<List<long>>("Images")
+                        .HasColumnType("bigint[]")
+                        .HasColumnName("images");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("pictures_models");
+                });
+
             modelBuilder.Entity("Entity.Models.ResourceCategory", b =>
                 {
                     b.Property<long>("Id")
@@ -470,16 +534,6 @@ namespace DatabaseBroker.Migrations
                         .HasColumnName("subject");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FileIdEN");
-
-                    b.HasIndex("FileIdGER");
-
-                    b.HasIndex("FileIdRU");
-
-                    b.HasIndex("FileIdUZ");
-
-                    b.HasIndex("ResourceCategoryId");
 
                     b.ToTable("resources");
                 });
@@ -673,47 +727,15 @@ namespace DatabaseBroker.Migrations
                     b.Navigation("Pictures");
                 });
 
-            modelBuilder.Entity("Entity.Models.Resources", b =>
+            modelBuilder.Entity("Entity.Models.PicturesModel", b =>
                 {
-                    b.HasOne("Entity.Models.File.FileModel", "FileEN")
+                    b.HasOne("Entity.Models.ImageCategory", "ImageCategory")
                         .WithMany()
-                        .HasForeignKey("FileIdEN")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entity.Models.File.FileModel", "FileGER")
-                        .WithMany()
-                        .HasForeignKey("FileIdGER")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entity.Models.File.FileModel", "FileRU")
-                        .WithMany()
-                        .HasForeignKey("FileIdRU")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entity.Models.File.FileModel", "FileUZ")
-                        .WithMany()
-                        .HasForeignKey("FileIdUZ")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entity.Models.ResourceCategory", "Category")
-                        .WithMany()
-                        .HasForeignKey("ResourceCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("FileEN");
-
-                    b.Navigation("FileGER");
-
-                    b.Navigation("FileRU");
-
-                    b.Navigation("FileUZ");
+                    b.Navigation("ImageCategory");
                 });
 #pragma warning restore 612, 618
         }
