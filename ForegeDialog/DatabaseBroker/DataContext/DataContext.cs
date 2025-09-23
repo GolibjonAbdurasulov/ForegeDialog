@@ -42,6 +42,8 @@ public class DataContext : DbContext
     public  DbSet<ImageModel> ImageModels { get; set; }
     public  DbSet<ImageCategory> ImageCategories { get; set; }
     public  DbSet<PicturesModel> PicturesModels { get; set; }
+    public  DbSet<ReferenceModel> ReferenceModels { get; set; }
+    public  DbSet<ReferenceToBlog> ReferenceToBlogs { get; set; }
 
 
     // private void TrackActionsAt()

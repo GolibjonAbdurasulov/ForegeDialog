@@ -26,6 +26,7 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Controllers\PublisherController\PublisherDtos\" />
+      <Folder Include="ReferenceToBlogController\" />
       <Folder Include="wwwroot\uploads\" />
     </ItemGroup>
 </Project>

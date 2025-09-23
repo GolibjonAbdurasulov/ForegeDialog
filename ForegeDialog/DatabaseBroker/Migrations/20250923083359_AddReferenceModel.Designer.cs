@@ -5,6 +5,7 @@ using DatabaseBroker;
 using Entity.Models.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DatabaseBroker.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250923083359_AddReferenceModel")]
+    partial class AddReferenceModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -474,39 +477,15 @@ namespace DatabaseBroker.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("category_id");
 
-                    b.Property<long>("PicturesModelId")
+                    b.Property<long>("ItemId")
                         .HasColumnType("bigint")
-                        .HasColumnName("pictures_model_id");
+                        .HasColumnName("item_id");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.ToTable("reference_models");
-                });
-
-            modelBuilder.Entity("Entity.Models.ReferenceToBlog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("BlogId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("blog_id");
-
-                    b.Property<long>("CategoryId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("category_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("reference_to_blog");
                 });
 
             modelBuilder.Entity("Entity.Models.ResourceCategory", b =>
@@ -784,17 +763,6 @@ namespace DatabaseBroker.Migrations
                 });
 
             modelBuilder.Entity("Entity.Models.ReferenceModel", b =>
-                {
-                    b.HasOne("Entity.Models.OurCategories", "Categories")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Categories");
-                });
-
-            modelBuilder.Entity("Entity.Models.ReferenceToBlog", b =>
                 {
                     b.HasOne("Entity.Models.OurCategories", "Categories")
                         .WithMany()
