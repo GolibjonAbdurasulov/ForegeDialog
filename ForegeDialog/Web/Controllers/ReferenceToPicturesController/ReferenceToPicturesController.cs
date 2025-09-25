@@ -1,10 +1,12 @@
 using DatabaseBroker.Repositories.OurCategoriesRepository;
+using DatabaseBroker.Repositories.PicturesModelRepository;
 using DatabaseBroker.Repositories.ReferenceModelRepository;
 using Entity.Exceptions;
 using Entity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Common;
+using Web.Controllers.PicturesModelController.Dtos;
 using Web.Controllers.ReferenceToPicturesController.Dtos;
 
 namespace Web.Controllers.ReferenceToPicturesController;
@@ -13,11 +15,13 @@ namespace Web.Controllers.ReferenceToPicturesController;
 [Route("[controller]/[action]")]
 public class ReferenceToPicturesController(
     IOurCategoriesRepository ourCategoriesRepository,
-    IReferenceModelRepository referenceModelRepository)
+    IReferenceModelRepository referenceModelRepository,
+    IPicturesModelRepository picturesModelRepository)
     : ControllerBase
 {
-    public IOurCategoriesRepository OurCategoriesRepository { get; set; } = ourCategoriesRepository;
-    public IReferenceModelRepository ReferenceModelRepository { get; set; } = referenceModelRepository;
+    private IPicturesModelRepository  _picturesModelRepository = picturesModelRepository;
+    private IOurCategoriesRepository OurCategoriesRepository { get; set; } = ourCategoriesRepository;
+    private IReferenceModelRepository ReferenceModelRepository { get; set; } = referenceModelRepository;
 
     [HttpPost]
     [Authorize]
@@ -91,16 +95,31 @@ public class ReferenceToPicturesController(
             Where(item=>item.CategoryId==id).ToList();
 
         if (res == null)
-            throw new NotFoundException("ReferenceModel not found");
+            throw new NotFoundException("ReferenceModel not found on referenceToPicturesController");
         
-        List<ReferenceModelDto> resDto = new List<ReferenceModelDto>();
+        List<ReferenceToPicturesGetDto> resDto = new List<ReferenceToPicturesGetDto>();
+        var category = res[0].Categories.Name;
         foreach (ReferenceModel model in res)
         {
-            resDto.Add(new ReferenceModelDto
+            var pictures= _picturesModelRepository.GetAllAsQueryable().
+                FirstOrDefault(item => item.Id == model.PicturesModelId);
+            
+            if (pictures == null)
+             throw new NotFoundException("ReferenceModel not found on referenceToPicturesController");
+            
+            
+            resDto.Add(new ReferenceToPicturesGetDto()
             {
                 Id = model.Id,
                 CategoryId = model.CategoryId,
-                PicturesModelId = model.PicturesModelId,
+                PicturesId = model.PicturesModelId,
+                Pictures = new PicturesDto
+                {
+                    Id = pictures.Id,
+                    CategoryId = pictures.CategoryId,
+                    CategoryName = category,
+                    ImagesIds = pictures.Images
+                },
             });
         }
         return new ResponseModelBase(resDto);
@@ -114,6 +133,7 @@ public class ReferenceToPicturesController(
         List<ReferenceModelDto> resDto = new List<ReferenceModelDto>();
         foreach (ReferenceModel model in res)
         {
+            
             resDto.Add(new ReferenceModelDto
             {
                 Id = model.Id,

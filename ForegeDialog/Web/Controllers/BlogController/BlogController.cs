@@ -147,7 +147,7 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
             var tags = await GetTagsAsync(res.Tags);
             var categories=await GetCategoriesAsync(res.Categories);
 
-            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
+            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id)!.Count;
 
             
             dtos.Add(new BlogDto()
