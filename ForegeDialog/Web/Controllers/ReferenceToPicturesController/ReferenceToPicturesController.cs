@@ -91,11 +91,13 @@ public class ReferenceToPicturesController(
     [HttpGet]
     public async Task<ResponseModelBase> GetReferencesByCategoryIdsAsync(long id)
     {
-        var res =   ReferenceModelRepository.GetAllAsQueryable().
-            Where(item=>item.CategoryId==id).ToList();
-
-        if (res == null)
-            throw new NotFoundException("ReferenceModel not found on referenceToPicturesController");
+      
+          var   res =   ReferenceModelRepository.GetAllAsQueryable().
+                Where(item=>item.CategoryId==id).ToList();
+        
+          
+        if (res == null || res.Count == 0)
+            throw new NotFoundException("ReferenceModel not found or There are no references with such categoryId on referenceToPicturesController");
         
         List<ReferenceToPicturesGetDto> resDto = new List<ReferenceToPicturesGetDto>();
         var category = res[0].Categories.Name;

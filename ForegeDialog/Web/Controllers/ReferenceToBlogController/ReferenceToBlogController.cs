@@ -118,7 +118,7 @@ public class ReferenceToBlogController(
         var listEntities =   ReferenceToBlogRepository.GetAllAsQueryable().
             Where(item=>item.CategoryId==id).ToList();
         
-        if (listEntities == null)
+        if (listEntities == null || listEntities.Count == 0)
             throw new NotFoundException("ReferenceModel not found");
         
         
