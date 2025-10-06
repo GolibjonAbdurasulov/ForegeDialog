@@ -8,4 +8,5 @@ public class ReferenceToPicturesGetDto
     public long CategoryId { get; set; }
     public long PicturesId { get; set; }
     public PicturesDto? Pictures { get; set; }
+    public List<string> DownloadLinks { get; set; }
 }

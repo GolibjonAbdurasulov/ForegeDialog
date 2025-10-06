@@ -1,3 +1,4 @@
+using DatabaseBroker.Repositories.ImageModelRepository;
 using DatabaseBroker.Repositories.OurCategoriesRepository;
 using DatabaseBroker.Repositories.PicturesModelRepository;
 using DatabaseBroker.Repositories.ReferenceModelRepository;
@@ -5,6 +6,7 @@ using Entity.Exceptions;
 using Entity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Web.Common;
 using Web.Controllers.PicturesModelController.Dtos;
 using Web.Controllers.ReferenceToPicturesController.Dtos;
@@ -16,12 +18,15 @@ namespace Web.Controllers.ReferenceToPicturesController;
 public class ReferenceToPicturesController(
     IOurCategoriesRepository ourCategoriesRepository,
     IReferenceModelRepository referenceModelRepository,
-    IPicturesModelRepository picturesModelRepository)
+    IPicturesModelRepository picturesModelRepository,
+    IImageModelRepository imageModelRepository)
     : ControllerBase
 {
     private IPicturesModelRepository  _picturesModelRepository = picturesModelRepository;
     private IOurCategoriesRepository OurCategoriesRepository { get; set; } = ourCategoriesRepository;
     private IReferenceModelRepository ReferenceModelRepository { get; set; } = referenceModelRepository;
+    private IImageModelRepository ImageModelRepository { get; set; } = imageModelRepository;
+    
 
     [HttpPost]
     [Authorize]
@@ -78,12 +83,15 @@ public class ReferenceToPicturesController(
     public async Task<ResponseModelBase> GetByIdAsync(long id)
     {
         var res =  await ReferenceModelRepository.GetByIdAsync(id);
-
+        var ids =await GetIds(res);
+        var links =await GenerateDownloadLinkAsync(ids);
+        
         var dto=new ReferenceModelDto
         {
             Id = res.Id,
             CategoryId = res.CategoryId,
             PicturesModelId = res.PicturesModelId,
+            DownloadLinks = links
         };
         return new ResponseModelBase(dto);
     }
@@ -109,7 +117,9 @@ public class ReferenceToPicturesController(
             if (pictures == null)
              throw new NotFoundException("ReferenceModel not found on referenceToPicturesController");
             
-            
+            var ids =await GetIds(model);
+            var links =await GenerateDownloadLinkAsync(ids);
+
             resDto.Add(new ReferenceToPicturesGetDto()
             {
                 Id = model.Id,
@@ -120,8 +130,9 @@ public class ReferenceToPicturesController(
                     Id = pictures.Id,
                     CategoryId = pictures.CategoryId,
                     CategoryName = category,
-                    ImagesIds = pictures.Images
+                    ImagesIds = pictures.Images,
                 },
+                DownloadLinks = links
             });
         }
         return new ResponseModelBase(resDto);
@@ -135,14 +146,43 @@ public class ReferenceToPicturesController(
         List<ReferenceModelDto> resDto = new List<ReferenceModelDto>();
         foreach (ReferenceModel model in res)
         {
-            
+            var ids =await GetIds(model);
+            var links =await GenerateDownloadLinkAsync(ids);
+
             resDto.Add(new ReferenceModelDto
             {
                 Id = model.Id,
                 CategoryId = model.CategoryId,
                 PicturesModelId = model.PicturesModelId,
+                DownloadLinks = links
             });
         }
         return new ResponseModelBase(resDto);
+    }
+
+    private async Task<List<string>> GenerateDownloadLinkAsync(List<Guid> list)
+    {
+        List<string> res= new List<string>();
+        foreach (Guid id in list)
+        {
+            res.Add($"https://back.foragedialog.uz/File/DownloadFile/download/{id}");
+        }
+        return res;
+    }
+    private async Task<List<Guid>> GetIds(ReferenceModel referenceModel)
+    {
+        List<Guid> res= new List<Guid>();
+        var pictures = await _picturesModelRepository.GetByIdAsync(referenceModel.PicturesModelId);
+
+        var images = await ImageModelRepository
+            .GetAllAsQueryable()
+            .Where(model => pictures.Images.Contains(model.Id))
+            .ToListAsync();
+        
+        foreach (ImageModel image in images)
+        {
+            res.Add(image.FileId);
+        }
+        return res;
     }
 }
