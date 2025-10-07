@@ -90,7 +90,6 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
         return new ResponseModelBase(dto);
     }
     
-    
     [HttpDelete]
     [Authorize]
     public async Task<ResponseModelBase> DeleteAsync(long id)
