@@ -134,6 +134,7 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
             TagsIds = res.Tags,
             CategoriesIds = res.Categories,
             Images = res.Images,
+            ImagesLinks = GenerateDownloadLinkAsync(res.Images),
             ReadingTime = res.ReadingTime,
             PublishedDate = res.PublishedDate,
             PublisherId = res.PublisherId,
@@ -167,6 +168,7 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
                 Tags = tags,
                 Categories = categories,
                 Images=res.Images,
+                ImagesLinks = GenerateDownloadLinkAsync(res.Images),
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
                 PublisherId = res.PublisherId,
@@ -296,6 +298,7 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
                 Tags = tags,
                 Categories = categories,
                 Images = res.Images,
+                ImagesLinks = GenerateDownloadLinkAsync(res.Images),
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
                 PublisherId = res.PublisherId,
@@ -332,6 +335,7 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
                 Tags = tags,
                 Categories = categories,
                 Images = res.Images,
+                ImagesLinks = GenerateDownloadLinkAsync(res.Images),
                 ReadingTime = res.ReadingTime,
                 PublishedDate = res.PublishedDate,
                 PublisherId = res.PublisherId,
@@ -340,6 +344,16 @@ public class NewsController(INewsRepository newsRepository,IViewsRepository view
         }
 
         return new ResponseModelBase(dtos);
+    }
+    
+    private List<string> GenerateDownloadLinkAsync(List<Guid> list)
+    {
+        List<string> res= new List<string>();
+        foreach (Guid id in list)
+        {
+            res.Add($"https://back.foragedialog.uz/File/DownloadFile/download/{id}");
+        }
+        return res;
     }
 
 }

@@ -14,6 +14,8 @@ public class NewsDto
     public List<long> CategoriesIds { get; set; }   
     public List<long> TagsIds { get; set; }
     public List<Guid> Images{ get; set; }
+    public List<string> ImagesLinks{ get; set; }
+    
     public string ReadingTime{ get; set; }   
     public DateTime PublishedDate { get; set; } 
     public long PublisherId { get; set; }
