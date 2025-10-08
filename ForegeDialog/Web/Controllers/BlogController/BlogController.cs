@@ -136,41 +136,92 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
         return new ResponseModelBase(dto);
     }
     [HttpGet]
+    
+    [HttpGet]
     public async Task<ResponseModelBase> GetAllAsync()
     {
-        var resNews =   BlogModelRepository.GetAllAsQueryable().ToList();
-        List<BlogDto> dtos = new List<BlogDto>();
+        // 1️⃣ Butun bloglarni olish, trackingni o'chirish
+        var blogs = await BlogModelRepository.GetAllAsQueryable()
+            .AsNoTracking()
+            .ToListAsync();
 
-        foreach (BlogModel res in resNews)
+        // 2️⃣ Barcha tags va categories ni oldindan olish
+        var allTags = await TagsRepository.GetAllAsQueryable().AsNoTracking().ToListAsync();
+        var allCategories = await NewsCategoryRepository.GetAllAsQueryable().AsNoTracking().ToListAsync();
+
+        // 3️⃣ Barcha views ni oldindan olish
+        var allViews = await ViewsRepository.GetAllAsQueryable()
+            .AsNoTracking()
+            .GroupBy(v => v.ItemId)
+            .Select(g => new { ItemId = g.Key, Count = g.Sum(v => v.Count) })
+            .ToListAsync();
+
+        // 4️⃣ DTO yaratish
+        var dtos = blogs.Select(blog =>
         {
-            var tags = await GetTagsAsync(res.Tags);
-            var categories=await GetCategoriesAsync(res.Categories);
+            var tags = allTags.Where(t => blog.Tags.Contains(t.Id)).Select(t => t.TagName).ToList();
+            var categories = allCategories.Where(c => blog.Categories.Contains(c.Id))
+                .Select(c => c.CategoryName)
+                .ToList();
+            var viewsCount = allViews.FirstOrDefault(v => v.ItemId == blog.Id)?.Count ?? 0;
 
-            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id)!.Count;
-
-            
-            dtos.Add(new BlogDto()
+            return new BlogDto
             {
-                Id = res.Id,
-                Subject = res.Subject,
-                Title = res.Title,
-                Text = res.Text,
-                TagsIds = res.Categories,
-                CategoriesIds = res.Tags,
+                Id = blog.Id,
+                Subject = blog.Subject,
+                Title = blog.Title,
+                Text = blog.Text,
+                TagsIds = blog.Tags,
+                CategoriesIds = blog.Categories,
                 Tags = tags,
                 Categories = categories,
-                Images=res.Images,
-                ReadingTime = res.ReadingTime,
-                PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId,
-                ViewsCount = n
+                Images = blog.Images,
+                ReadingTime = blog.ReadingTime,
+                PublishedDate = blog.PublishedDate,
+                PublisherId = blog.PublisherId,
+                ViewsCount = viewsCount
+            };
+        }).ToList();
 
-            });
-        }
-        
         return new ResponseModelBase(dtos);
     }
-    
+
+
+    // [HttpGet]
+    // public async Task<ResponseModelBase> GetAllAsync()
+    // {
+    //     var resNews =   BlogModelRepository.GetAllAsQueryable().ToList();
+    //     List<BlogDto> dtos = new List<BlogDto>();
+    //
+    //     foreach (BlogModel res in resNews)
+    //     {
+    //         var tags = await GetTagsAsync(res.Tags);
+    //         var categories=await GetCategoriesAsync(res.Categories);
+    //
+    //         var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id)!.Count;
+    //         
+    //         dtos.Add(new BlogDto()
+    //         {
+    //             Id = res.Id,
+    //             Subject = res.Subject,
+    //             Title = res.Title,
+    //             Text = res.Text,
+    //             TagsIds = res.Categories,
+    //             CategoriesIds = res.Tags,
+    //             Tags = tags,
+    //             Categories = categories,
+    //             Images=res.Images,
+    //             ReadingTime = res.ReadingTime,
+    //             PublishedDate = res.PublishedDate,
+    //             PublisherId = res.PublisherId,
+    //             ViewsCount = n
+    //
+    //         });
+    //     }
+    //     
+    //     return new ResponseModelBase(dtos);
+    // }
+    //
     private async Task<List<MultiLanguageField>> GetTagsAsync(List<long> tagsIds)
     {
         if (tagsIds == null || tagsIds.Count == 0)
@@ -193,76 +244,134 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
             .ToListAsync();
     }
     
+    // [HttpGet]
+    // public async Task<ResponseModelBase> GetAllByNewestAsync()
+    // {
+    //     var resBlog = BlogModelRepository.GetAllAsQueryable()
+    //         .OrderByDescending(n => n.PublishedDate)  // yangi birinchi
+    //         .ToList();
+    //
+    //     List<BlogDto> dtos = new List<BlogDto>();
+    //
+    //     foreach (BlogModel res in resBlog)
+    //     {
+    //         var tags = await GetTagsAsync(res.Tags);
+    //         var categories = await GetCategoriesAsync(res.Categories);
+    //         var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
+    //
+    //         dtos.Add(new BlogDto()
+    //         {
+    //             Id = res.Id,
+    //             Subject = res.Subject,
+    //             Title = res.Title,
+    //             Text = res.Text,
+    //             TagsIds = res.Tags,
+    //             CategoriesIds = res.Categories,
+    //             Tags = tags,
+    //             Categories = categories,
+    //             Images = res.Images,
+    //             ReadingTime = res.ReadingTime,
+    //             PublishedDate = res.PublishedDate,
+    //             PublisherId = res.PublisherId,
+    //             ViewsCount = n
+    //         });
+    //     }
+    //
+    //     return new ResponseModelBase(dtos);
+    // }
+    //
+    // [HttpGet]
+    // public async Task<ResponseModelBase> GetAllByOldestAsync()
+    // {
+    //     var resBlog = BlogModelRepository.GetAllAsQueryable()
+    //         .OrderBy(n => n.PublishedDate)  // eski birinchi
+    //         .ToList();
+    //
+    //     List<BlogDto> dtos = new List<BlogDto>();
+    //
+    //     foreach (BlogModel res in resBlog)
+    //     {
+    //         var tags = await GetTagsAsync(res.Tags);
+    //         var categories = await GetCategoriesAsync(res.Categories);
+    //         var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
+    //         dtos.Add(new BlogDto()
+    //         {
+    //             Id = res.Id,
+    //             Subject = res.Subject,
+    //             Title = res.Title,
+    //             Text = res.Text,
+    //             TagsIds = res.Tags,
+    //             CategoriesIds = res.Categories,
+    //             Tags = tags,
+    //             Categories = categories,
+    //             Images = res.Images,
+    //             ReadingTime = res.ReadingTime,
+    //             PublishedDate = res.PublishedDate,
+    //             PublisherId = res.PublisherId,
+    //             ViewsCount = n
+    //         });
+    //     }
+    //
+    //     return new ResponseModelBase(dtos);
+    // }
+
     [HttpGet]
-    public async Task<ResponseModelBase> GetAllByNewestAsync()
+public async Task<ResponseModelBase> GetAllByNewestAsync()
+{
+    return await GetAllOrderedAsync(orderByDescending: true);
+}
+
+[HttpGet]
+public async Task<ResponseModelBase> GetAllByOldestAsync()
+{
+    return await GetAllOrderedAsync(orderByDescending: false);
+}
+
+private async Task<ResponseModelBase> GetAllOrderedAsync(bool orderByDescending)
+{
+    var blogsQuery = BlogModelRepository.GetAllAsQueryable().AsNoTracking();
+    blogsQuery = orderByDescending 
+        ? blogsQuery.OrderByDescending(b => b.PublishedDate)
+        : blogsQuery.OrderBy(b => b.PublishedDate);
+
+    var blogs = await blogsQuery.ToListAsync();
+
+    var allTags = await TagsRepository.GetAllAsQueryable().AsNoTracking().ToListAsync();
+    var allCategories = await NewsCategoryRepository.GetAllAsQueryable().AsNoTracking().ToListAsync();
+    var allViews = await ViewsRepository.GetAllAsQueryable()
+        .AsNoTracking()
+        .GroupBy(v => v.ItemId)
+        .Select(g => new { ItemId = g.Key, Count = g.Sum(v => v.Count) })
+        .ToListAsync();
+
+    var dtos = blogs.Select(blog =>
     {
-        var resBlog = BlogModelRepository.GetAllAsQueryable()
-            .OrderByDescending(n => n.PublishedDate)  // yangi birinchi
-            .ToList();
+        var tags = allTags.Where(t => blog.Tags.Contains(t.Id)).Select(t => t.TagName).ToList();
+        var categories = allCategories.Where(c => blog.Categories.Contains(c.Id))
+                                     .Select(c => c.CategoryName)
+                                     .ToList();
+        var viewsCount = allViews.FirstOrDefault(v => v.ItemId == blog.Id)?.Count ?? 0;
 
-        List<BlogDto> dtos = new List<BlogDto>();
-
-        foreach (BlogModel res in resBlog)
+        return new BlogDto
         {
-            var tags = await GetTagsAsync(res.Tags);
-            var categories = await GetCategoriesAsync(res.Categories);
-            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
+            Id = blog.Id,
+            Subject = blog.Subject,
+            Title = blog.Title,
+            Text = blog.Text,
+            TagsIds = blog.Tags,
+            CategoriesIds = blog.Categories,
+            Tags = tags,
+            Categories = categories,
+            Images = blog.Images,
+            ReadingTime = blog.ReadingTime,
+            PublishedDate = blog.PublishedDate,
+            PublisherId = blog.PublisherId,
+            ViewsCount = viewsCount
+        };
+    }).ToList();
 
-            dtos.Add(new BlogDto()
-            {
-                Id = res.Id,
-                Subject = res.Subject,
-                Title = res.Title,
-                Text = res.Text,
-                TagsIds = res.Tags,
-                CategoriesIds = res.Categories,
-                Tags = tags,
-                Categories = categories,
-                Images = res.Images,
-                ReadingTime = res.ReadingTime,
-                PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId,
-                ViewsCount = n
-            });
-        }
-
-        return new ResponseModelBase(dtos);
-    }
-
-    [HttpGet]
-    public async Task<ResponseModelBase> GetAllByOldestAsync()
-    {
-        var resBlog = BlogModelRepository.GetAllAsQueryable()
-            .OrderBy(n => n.PublishedDate)  // eski birinchi
-            .ToList();
-
-        List<BlogDto> dtos = new List<BlogDto>();
-
-        foreach (BlogModel res in resBlog)
-        {
-            var tags = await GetTagsAsync(res.Tags);
-            var categories = await GetCategoriesAsync(res.Categories);
-            var  n=ViewsRepository.GetAllAsQueryable().ToList().FirstOrDefault(item=>item.ItemId==res.Id).Count;
-            dtos.Add(new BlogDto()
-            {
-                Id = res.Id,
-                Subject = res.Subject,
-                Title = res.Title,
-                Text = res.Text,
-                TagsIds = res.Tags,
-                CategoriesIds = res.Categories,
-                Tags = tags,
-                Categories = categories,
-                Images = res.Images,
-                ReadingTime = res.ReadingTime,
-                PublishedDate = res.PublishedDate,
-                PublisherId = res.PublisherId,
-                ViewsCount = n
-            });
-        }
-
-        return new ResponseModelBase(dtos);
-    }
+    return new ResponseModelBase(dtos);
+}
 
     
    /* [HttpPost]
