@@ -1,6 +1,6 @@
 services:
   web:
-    image: ${DOCKER_USERNAME}/forege_dialog
+    image: ${DOCKER_USERNAME}/forege_dialog:latest
     build:
       context: .
       dockerfile: ForegeDialog/Web/Dockerfile
