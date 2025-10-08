@@ -15,15 +15,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          clean: false   # 🔹 uploads papkasini tozalamasin
+          clean: false
+
+      - name: Docker login
+        run: echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
 
       - name: Build Docker image
         run: sudo docker compose build
 
       - name: Push Docker image
-        run: |
-          echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
-          sudo docker compose push
+        run: sudo docker compose push
 
   Deploy:
     name: Deploy
@@ -38,17 +39,18 @@ jobs:
         with:
           clean: false
 
-      - name: Deploy
+      - name: Create .env file
         run: |
-          # 🔹 .env fayl yaratish
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
 
-          # 🔹 Docker login
-          echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
+      - name: Docker login
+        run: echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
 
-          # 🔹 Docker pull va run
+      - name: Pull and Deploy containers
+        run: |
+          sudo docker compose down --remove-orphans
           sudo docker compose pull
           sudo docker compose up -d --remove-orphans
