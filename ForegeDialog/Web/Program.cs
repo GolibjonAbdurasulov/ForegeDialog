@@ -94,24 +94,24 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Response Compression (Gzip)
-builder.Services.AddResponseCompression(options =>
-{
-    options.EnableForHttps = true;
-    options.Providers.Add<GzipCompressionProvider>();
-    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
-    {
-        "application/json",
-        "text/plain",
-        "text/html",
-        "application/javascript",
-        "text/css"
-    });
-});
-builder.Services.Configure<GzipCompressionProviderOptions>(options =>
-{
-    options.Level = CompressionLevel.Fastest;
-});
+// // Response Compression (Gzip)
+// builder.Services.AddResponseCompression(options =>
+// {
+//     options.EnableForHttps = true;
+//     options.Providers.Add<GzipCompressionProvider>();
+//     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+//     {
+//         "application/json",
+//         "text/plain",
+//         "text/html",
+//         "application/javascript",
+//         "text/css"
+//     });
+// });
+// builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+// {
+//     options.Level = CompressionLevel.Fastest;
+// });
 
 // Controllers va servislar
 builder.Services.AddControllers();
@@ -147,7 +147,6 @@ var app = builder.Build();
 // Middleware
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseHttpsRedirection();
-app.UseResponseCompression(); // Gzip
 app.UseRouting();
 app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
