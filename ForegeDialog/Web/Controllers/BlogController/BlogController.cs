@@ -128,7 +128,6 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
             TagsIds = res.Tags,
             CategoriesIds = res.Categories,
             Images = res.Images,
-            ImagesLinks = GenerateDownloadLinkAsync(res.Images),
             ReadingTime = res.ReadingTime,
             PublishedDate = res.PublishedDate,
             PublisherId = res.PublisherId,
@@ -177,7 +176,6 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
                 Tags = tags,
                 Categories = categories,
                 Images = blog.Images,
-                ImagesLinks = GenerateDownloadLinkAsync(blog.Images),
                 ReadingTime = blog.ReadingTime,
                 PublishedDate = blog.PublishedDate,
                 PublisherId = blog.PublisherId,
@@ -188,15 +186,7 @@ public class BlogController(IBlogModelRepository blogModelRepository,IViewsRepos
         return new ResponseModelBase(dtos);
     }
 
-    private List<string> GenerateDownloadLinkAsync(List<Guid> list)
-    {
-        List<string> res= new List<string>();
-        foreach (Guid id in list)
-        {
-            res.Add($"https://back.foragedialog.uz/File/DownloadFile/download/{id}");
-        }
-        return res;
-    }
+    
     // [HttpGet]
     // public async Task<ResponseModelBase> GetAllAsync()
     // {
@@ -373,7 +363,6 @@ private async Task<ResponseModelBase> GetAllOrderedAsync(bool orderByDescending)
             Tags = tags,
             Categories = categories,
             Images = blog.Images,
-            ImagesLinks = GenerateDownloadLinkAsync(blog.Images),
             ReadingTime = blog.ReadingTime,
             PublishedDate = blog.PublishedDate,
             PublisherId = blog.PublisherId,
