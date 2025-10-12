@@ -147,7 +147,7 @@ public class ReferenceToBlogController(
                     Id = blogModel.Id,
                     Subject = blogModel.Subject,
                     Title = blogModel.Title,
-                    Text = blogModel.Text,
+                    Text = "text",
                     TagsIds = blogModel.Categories,
                     CategoriesIds = blogModel.Tags,
                     Tags = tags,

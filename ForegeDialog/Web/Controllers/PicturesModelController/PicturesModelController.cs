@@ -1,6 +1,7 @@
 using DatabaseBroker.Repositories.ImageCategoryRepository;
 using DatabaseBroker.Repositories.ImageModelRepository;
 using DatabaseBroker.Repositories.PicturesModelRepository;
+using DatabaseBroker.Repositories.ReferenceModelRepository;
 using DatabaseBroker.Repositories.ResourceCategoryRepository;
 using Entity.Exceptions;
 using Entity.Models;
@@ -17,13 +18,14 @@ namespace Web.Controllers.PicturesModelController;
 public class PicturesModelController(
     IPicturesModelRepository picturesModelRepository,
     IImageCategoryRepository imageCategoryRepository,
-    IImageModelRepository imageModelRepository)
+    IImageModelRepository imageModelRepository,
+    IReferenceModelRepository referenceModelRepository)
     : ControllerBase
 {
     private IPicturesModelRepository PicturesModelRepository { get; set; } = picturesModelRepository;
     private IImageCategoryRepository ImageCategoryRepository { get; set; } = imageCategoryRepository;
     private IImageModelRepository ImageModelRepository { get; set; } = imageModelRepository;
-
+    private IReferenceModelRepository ReferenceModelRepository { get; set; } = referenceModelRepository;
 
     [HttpPost]
     [Authorize]
@@ -91,10 +93,28 @@ public class PicturesModelController(
     [Authorize]
     public async Task<ResponseModelBase> DeleteAsync(long id)
     {
-
         var res = await PicturesModelRepository.GetByIdAsync(id);
         await PicturesModelRepository.RemoveAsync(res);
-        return new ResponseModelBase(res);
+
+        try
+        {
+            var referenceModel= ReferenceModelRepository.FirstOrDefault(item=>item.PicturesModelId==res.Id);
+            try
+            {
+                await ReferenceModelRepository.RemoveAsync(referenceModel);
+            }
+            catch (Exception e)
+            {
+                throw new NullReferenceException(e.Message);
+            }
+
+            return new ResponseModelBase(res);
+        }
+        
+        catch (Exception e)
+        {
+            throw new NullReferenceException(e.Message);
+        }
     }
 
     [HttpGet]
